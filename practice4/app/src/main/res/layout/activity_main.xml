@@ -10,13 +10,13 @@
     <FrameLayout
         android:layout_marginTop="20dp"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/frameSize">
+        android:layout_height="500dp">
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewpager"
             android:clipToPadding="false"
             android:clipChildren="false"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/frameSize" />
+            android:layout_height="500dp" />
 
         <me.relex.circleindicator.CircleIndicator3
             android:id="@+id/indicator"
@@ -30,7 +30,10 @@
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="뷰어 밑에 위치"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:text="으에에엥"
+        android:textColor="#00BCD4"
+        android:textSize="50dp"
+        android:textStyle="bold" />
 
 </LinearLayout>
