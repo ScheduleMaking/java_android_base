@@ -1,70 +1,75 @@
 package com.example.practice4;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
 
-import java.util.List;
-
-import me.relex.circleindicator.CircleIndicator3;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private ViewPager2 mPager;
-    private FragmentStateAdapter pageAdpter;
-    private int num_page = 4;
-    private CircleIndicator3 mIndicator;
+    private ListView listView;
+    private Button button;
+    private View dialogView, toastView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //ViewPager2
-        mPager = findViewById(R.id.viewpager);
-        //Adapter
-        pageAdpter = new MyAdpater(this, num_page);
-        mPager.setAdapter(pageAdpter);
-        //Indicator
-        mIndicator = findViewById(R.id.indicator);
-        mIndicator.setViewPager(mPager);
-        mIndicator.createIndicators(num_page,0);
-        //ViewPager Setting
-        mPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
-        mPager.setCurrentItem(0); // 현재 위치 0
-        mPager.setOffscreenPageLimit(3);
+        final ArrayList<String> midList = new ArrayList<String>();
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, midList);
 
-        mPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+        listView = findViewById(R.id.listView);
+        button = findViewById(R.id.button);
+        final EditText[] editText = {findViewById(R.id.dlgEdt)};
 
-                if(positionOffsetPixels == 0) mPager.setCurrentItem(position);
-            }
+        listView.setAdapter(adapter);
+
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onPageSelected(int position){
-                super.onPageSelected(position);
-                mIndicator.animatePageSelected(position % num_page);
+            public void onClick(View view) {
+                dialogView = View.inflate(MainActivity.this, R.layout.dialog, null);
+                AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
+
+                dlg.setTitle("할일 입력");
+                dlg.setView(dialogView);
+                dlg.setPositiveButton("저장", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        editText[0] = dialogView.findViewById(R.id.dlgEdt);
+
+                        midList.add(editText[0].getText().toString());
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+                dlg.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast toast = new Toast(MainActivity.this);
+                        toastView = View.inflate(MainActivity.this, R.layout.toast, null);
+                        toast.setView(toastView);
+                        toast.show();
+                    }
+                });
+                dlg.show();
             }
         });
 
-        final float pageMargin = getResources().getDimensionPixelOffset(R.dimen.pageMargin);
-        final float pageOffset = getResources().getDimensionPixelOffset(R.dimen.offset);
-
-        mPager.setPageTransformer(new ViewPager2.PageTransformer() {
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public void transformPage(@NonNull View page, float position) {
-                float myOffset = position * -(2 * pageOffset + pageMargin);
-                if(mPager.getOrientation() == ViewPager2.ORIENTATION_HORIZONTAL){
-                    if(ViewCompat.getLayoutDirection(mPager) == ViewCompat.LAYOUT_DIRECTION_RTL)
-                        page.setTranslationX(-myOffset);
-                    else page.setTranslationX(myOffset);
-                }
-                else page.setTranslationY(myOffset);
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                midList.remove(i);
+                adapter.notifyDataSetChanged();
+                return false;
             }
         });
     }
